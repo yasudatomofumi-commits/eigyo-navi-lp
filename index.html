@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+  <title>営業外部化ナビ — 人・AI・ハイブリッドを中立に診断</title>
+<meta name="description" content="営業代行・AI SDR・SaaS・内製強化。どの外部化があなたの商材に合うか、中立の立場で30秒診断。相場・選定基準・レッドフラグまで。">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50:'#f0f5ff',100:'#dde8ff',200:'#c0d4ff',300:'#95b6ff',
+          400:'#6492ff',500:'#2b70ef',600:'#2250df',700:'#1a40b5',
+          800:'#13318d',900:'#0e266a',950:'#07194e'
+        }
+      },
+      fontFamily: {
+        sans: ['Inter','Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP','sans-serif']
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: Inter,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; }
+  .text-body { color:#3d4b5f; }
+  .fade-in { animation: fade .4s ease both; }
+  @keyframes fade { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body class="bg-gray-50 text-slate-900">
+
+<!-- ヘッダー -->
+<header class="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="w-7 h-7 rounded-lg bg-primary-500 inline-flex items-center justify-center text-white text-sm font-bold">営</span>
+      <span class="font-semibold tracking-tight">営業外部化ナビ</span>
+    </div>
+    <nav aria-label="メインナビゲーション" class="hidden sm:flex items-center gap-6 text-sm text-body">
+      <a href="#why" class="hover:text-slate-900">なぜ中立診断か</a>
+      <a href="#compare" class="hover:text-slate-900">4つの選択肢</a>
+      <a href="#diagnose" class="inline-flex items-center h-9 px-4 text-white bg-primary-500 rounded-lg hover:bg-primary-700 font-medium">診断する</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ヒーロー（タップ先行） -->
+<section class="border-b border-slate-200 bg-white">
+  <div class="max-w-6xl mx-auto px-5 pt-14 pb-12">
+    <div class="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-medium border border-primary-200">
+      人力比較でもAIツール比較でもない、横断・中立の診断
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 leading-tight tracking-tight max-w-3xl">
+      あなたの営業、<br class="sm:hidden">どう外部化するのが正解か。
+    </h1>
+    <p class="mt-4 text-base text-body leading-relaxed max-w-2xl">
+      プロの営業代行・AI SDR・分業ハイブリッド・内製強化。<span class="text-slate-900 font-medium">4つの選択肢</span>を、商材と体制から中立に見極めます。相場・選定基準・避けるべき地雷まで、その場で。
+    </p>
+
+    <!-- 目的タップ（1タップで開始・ブランクページ回避） -->
+    <div class="mt-8">
+      <p class="text-sm font-medium text-slate-900 mb-3">まず、いま一番の目的をひとつ選んでください。</p>
+      <div id="goal-chips" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl"></div>
+      <p class="mt-3 text-xs text-slate-500">選ぶとすぐ診断が始まります・所要30秒・登録不要</p>
+    </div>
+  </div>
+</section>
+
+<!-- 診断ウィザード（目的選択で出現） -->
+<section id="diagnose" class="max-w-6xl mx-auto px-5">
+  <div id="wizard" class="hidden py-10">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-slate-900">あと数タップで精度が上がります</h2>
+        <span id="progress-label" class="text-xs text-slate-500"></span>
+      </div>
+      <div class="h-1.5 bg-slate-200 rounded-full mb-8" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="progress-fill" class="h-1.5 bg-primary-500 rounded-full transition-all" style="width:0%"></div>
+      </div>
+      <div id="wizard-questions" class="space-y-7"></div>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <button id="run-btn" class="inline-flex items-center justify-center gap-2 h-12 px-6 text-[1rem] font-medium bg-primary-500 text-white rounded-lg hover:bg-primary-700 cursor-pointer">
+          診断する
+        </button>
+        <span class="text-xs text-slate-500">任意項目は飛ばしてOK。目的だけでも診断できます。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 結果 -->
+  <div id="result" class="hidden py-10"></div>
+</section>
+
+<!-- なぜ中立診断か -->
+<section id="why" class="border-t border-slate-200 bg-white">
+  <div class="max-w-6xl mx-auto px-5 py-14">
+    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">なぜ「中立診断」なのか</h2>
+    <p class="mt-3 text-base text-body leading-relaxed max-w-2xl">営業外部化の情報は、人力代行の比較サイトとAIツールの比較サイトに分断されています。両者を横断して、あなたの条件で裁く場所がありませんでした。</p>
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-gray-50 rounded-xl border border-slate-200 p-6">
+        <div class="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 inline-flex items-center justify-center mb-4 font-bold">中</div>
+        <h3 class="font-semibold text-slate-900">売り込まない</h3>
+        <p class="mt-2 text-sm text-body leading-relaxed">特定サービスへ誘導しません。診断はルールで判定し、相場や候補は事実だけを提示します。</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl border border-slate-200 p-6">
+        <div class="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 inline-flex items-center justify-center mb-4 font-bold">横</div>
+        <h3 class="font-semibold text-slate-900">人もAIも横断</h3>
+        <p class="mt-2 text-sm text-body leading-relaxed">プロ代行・AI SDR・分業・内製の4象限を同じ物差しで比較。片方の陣営に寄りません。</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl border border-slate-200 p-6">
+        <div class="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 inline-flex items-center justify-center mb-4 font-bold">地</div>
+        <h3 class="font-semibold text-slate-900">地雷まで示す</h3>
+        <p class="mt-2 text-sm text-body leading-relaxed">選定基準だけでなく、契約前に確認すべきレッドフラグまで具体的にお伝えします。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4つの選択肢（比較） -->
+<section id="compare" class="border-t border-slate-200">
+  <div class="max-w-6xl mx-auto px-5 py-14">
+    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">診断で分かる4つの選択肢</h2>
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="compare-cards"></div>
+    <div class="mt-8">
+      <a href="#top" onclick="document.getElementById('goal-chips').scrollIntoView({behavior:'smooth',block:'center'});return false;" class="inline-flex items-center justify-center gap-2 h-12 px-6 text-[1rem] font-medium bg-primary-500 text-white rounded-lg hover:bg-primary-700 cursor-pointer">
+        自分に合う選択肢を診断する
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- フッター -->
+<footer class="border-t border-slate-200 bg-white">
+  <div class="max-w-6xl mx-auto px-5 py-10 text-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-primary-500 inline-flex items-center justify-center text-white text-sm font-bold">営</span>
+        <span class="font-semibold text-slate-900">営業外部化ナビ</span>
+      </div>
+      <nav aria-label="フッターナビゲーション" class="flex flex-wrap gap-x-6 gap-y-2 text-body">
+        <a href="#" class="hover:text-slate-900">運営者情報</a>
+        <a href="#" class="hover:text-slate-900">利用規約</a>
+        <a href="#" class="hover:text-slate-900">プライバシーポリシー</a>
+        <a href="#" class="hover:text-slate-900">お問い合わせ</a>
+      </nav>
+    </div>
+    <p class="mt-6 text-xs text-slate-500">運営: SakuLabox（個人事業主）／掲載情報は<span id="asof-foot"></span>時点。診断結果は選定の参考であり、契約の成否を保証するものではありません。</p>
+  </div>
+</footer>
+
+<script>
+/* =========================================================================
+   判定エンジン（lib/diagnosis/engine.mjs + catalog.mjs + assemble.mjs のインライン移植）
+   本番は /api/diagnose（diagnose()）を叩く。ここはタップ先行・記述なし経路の忠実な複製。
+   ========================================================================= */
+const QUESTIONS = [
+  { id:'goal', k:'目的', hint:'いま一番達成したいこと', o:[
+    { t:'新規アポの獲得',       s:{A:1,C:2,D:0} },
+    { t:'商談〜クロージング',   s:{A:2,C:0,D:0} },
+    { t:'リード獲得・育成',     s:{A:0,C:2,D:1} },
+    { t:'仕組み化・効率化',     s:{A:0,C:1,D:2} },
+  ]},
+  { id:'price', k:'商材の単価帯', o:[
+    { t:'〜10万（低単価・大量）', s:{A:0,C:2,D:1} },
+    { t:'10〜100万',            s:{A:1,C:1,D:1} },
+    { t:'100万〜（高単価・複雑）',s:{A:2,C:0,D:0} },
+  ]},
+  { id:'complexity', k:'商材の複雑さ', o:[
+    { t:'シンプル',   s:{A:0,C:2,D:1} },
+    { t:'ふつう',     s:{A:1,C:1,D:1} },
+    { t:'複雑・専門的',s:{A:2,C:0,D:0} },
+  ]},
+  { id:'resource', k:'社内の営業リソース', o:[
+    { t:'いない/丸投げしたい', s:{A:2,C:1,D:0} },
+    { t:'少数いる/一部任せたい',s:{A:1,C:1,D:0} },
+    { t:'チームあり/ツール強化',s:{A:0,C:1,D:2} },
+  ]},
+  { id:'list', k:'アプローチ先リスト', o:[
+    { t:'自社リストあり',    s:{A:0,C:1,D:2} },
+    { t:'一部あるが足りない', s:{A:1,C:1,D:1} },
+    { t:'作成から任せたい',   s:{A:2,C:1,D:0} },
+  ]},
+  { id:'budget', k:'月あたり予算（任意）', optional:true, o:[
+    { t:'〜10万',   s:{A:0,C:2,D:2} },
+    { t:'10〜50万', s:{A:1,C:1,D:1} },
+    { t:'50万〜',   s:{A:2,C:1,D:0} },
+  ]},
+  { id:'urgency', k:'スピードと質', o:[
+    { t:'量・スピード優先', s:{A:0,C:2,D:1} },
+    { t:'質重視・じっくり', s:{A:2,C:0,D:1} },
+  ]},
+  { id:'ai', k:'AI活用のスタンス', o:[
+    { t:'自分で運用したい', s:{A:0,C:1,D:2} },
+    { t:'運用は任せたい',   s:{A:1,C:1,D:0} },
+    { t:'人にやってほしい', s:{A:2,C:0,D:0} },
+  ]},
+];
+const Q = Object.fromEntries(QUESTIONS.map(q=>[q.id,q]));
+
+const CATALOG = {
+  asOf:'2026年7月',
+  types:{
+    A1:{ name:'プロ営業代行型', sub:'アポ獲得特化', accent:'指',
+      head:'商談の「入口」は、経験ある営業のプロに任せましょう',
+      price:'成果報酬 1件1.5〜5万円 ／ 複合型（固定20〜50万＋アポ1.5〜5万）',
+      priceNote:'「アポ」＝商談機会。特化商材（IT・医療・金融等）は上振れ',
+      checks:['「アポの定義」（役職・課題ヒアリング・日程確定）を書面で確認','成果報酬型か複合型で、まず3ヶ月試せるか','商談トークの録音・引き継ぎメモを提供するか','同業種・同単価帯での実績があるか'],
+      redFlags:['アポの件数しか語らず、商談の中身（相手の役職・温度感）を説明しない','キャンセル・ノーショー時の扱いが不明','誰にどう話したかの記録（録音・メモ）を出さない'],
+      candidates:[{name:'総合営業代行（セレブリックス型）',why:'幅広い商材に対応し、まずアポの質を担保できる'},{name:'業界特化型テレアポ代行',why:'あなたの業界を理解した担当が付きやすい'},{name:'複合報酬型の代行',why:'固定＋成果でリスクを分散できる'}] },
+    A2:{ name:'プロ営業代行型', sub:'受注まで一貫', accent:'指',
+      head:'商談からクロージングまで、営業チームごと外付けしましょう',
+      price:'固定 月50〜100万円 ＋ 成果報酬（受注額の一部）',
+      priceNote:'顧客関係を託すため、受注実績と商材理解の深さが最重要',
+      checks:['受注実績を具体的に語れるか（アポ数でなく）','値引き・見積もりの承認ルールを契約前に決められるか','1商材・専任1〜2名で3ヶ月、商談化率と受注率を見て判断','内製化を見据えるなら、資料・トークの納品を契約に'],
+      redFlags:['受注実績を「アポ数」でしか語らない','値引き・見積もりの権限範囲を決めたがらない','顧客リスト・商談履歴の所有権が契約で曖昧（解約時に顧客関係ごと失う）'],
+      candidates:[{name:'総合営業代行（クロージング対応）',why:'受注まで一気通貫で任せられる'},{name:'業界特化型の受注代行',why:'専門商材の受注実績を持つ'}] },
+    B:{ name:'分業ハイブリッド型', sub:'AI×人の分業', accent:'橋',
+      head:'AIに「量」、人に「詰め」。分業で費用対効果を最大化しましょう',
+      price:'固定 月20〜50万円 ＋ 成果報酬',
+      priceNote:'人だけより安く、AIだけより質が高い中間帯',
+      checks:['「どこまでAI・どこから人か」の分担表を出せるか','品質が崩れた時のエスカレーション体制','固定+成果で、まず3ヶ月試せるか','将来、AI部分を自社に巻き取れる余地があるか'],
+      redFlags:['「AI活用」の中身が曖昧で、実態は人力と同じ','自動化を謳うが割高','AI部分の品質管理が発注者任せ'],
+      candidates:[{name:'アポドリ型のAI営業代行',why:'AIで量を出しつつ、人がアポの質を担保'},{name:'AI BPO各社',why:'定型はAI・非定型は人で費用対効果'},{name:'ハイブリッド型インサイドセールス代行',why:'量と質の中間を取れる'}] },
+    C:{ name:'AI集中型', sub:'AI SDR・AI商談ツール', accent:'AI',
+      head:'定型アプローチはAIに任せ、量とスピードで市場を取りましょう',
+      price:'月2〜10万円／ライセンス ＋ 初期設定費',
+      priceNote:'人間SDR（月40〜60万）比で接触量は数十倍',
+      checks:['自社商材・ターゲットでAIが機能した実績があるか','初期設定・チューニングの支援があるか','既存のCRM/SFAと連携できるか','2ヶ月目以降の返信率・商談化率で判断できるか'],
+      redFlags:['セットアップ丸投げで運用サポートがない','AIの返信品質が低くブランドを毀損','特定電子メール法などの法令対応・配信停止管理が曖昧'],
+      candidates:[{name:'immedio',why:'Web接客型で、興味の高い瞬間に商談化'},{name:'Meeton-AI',why:'商談設定・日程調整の自動化に強い'},{name:'Agentforce SDR',why:'Salesforceネイティブで既存データを活用'},{name:'Mazrica Engage',why:'上流のアウトリーチを複数AIで自動化'}] },
+    D:{ name:'内製強化型', sub:'自社チーム×ツール', accent:'内',
+      head:'外注より先に、いまのチームをツールで底上げしましょう',
+      price:'月 数千〜数万円／ツール',
+      priceNote:'外注せず、内製の生産性を底上げする方向',
+      checks:['既存の営業フロー／CRMと連携できるか','導入後の定着支援（オンボーディング）があるか','候補2つに絞って無料トライアルできるか','1ヶ月で「チームに定着するか」を確認'],
+      redFlags:['機能の多さを売りにする一方、導入後の定着支援がない','契約ツールだけ増えてデータが分断','使いこなせず放置'],
+      candidates:[{name:'MiiTel',why:'架電・商談を解析してトークを底上げ'},{name:'ACES Meet',why:'商談の議事録・示唆を自動抽出'},{name:'GeAIne',why:'リスト作成〜一斉メールを自動化'},{name:'SFA・CRM各種',why:'営業プロセスの土台を整える'}] },
+  }
+};
+const TEMPLATE = {
+  A1:'ご回答から、初回接触の段階から相手に合わせた対話が必要な商材だと読み取れます。アポの入口は経験ある人に任せるのが商談化率を左右します。',
+  A2:'ご回答から、商談・クロージングまで含めて任せたい状況が読み取れます。受注実績のある人に一貫委託するのが最短です。',
+  B:'量と質のどちらも落とせないご状況です。接触はAIで自動化し、詰めは人が担う分業がバランス良く効きます。',
+  C:'低単価の商材を大量・高速に届けたいご状況です。定型アプローチはAIに任せるのが最もコスト効率的です。',
+  D:'すでに営業チームがあり自走したいご状況です。外注より、いまのチームをツールで底上げする方が費用対効果で勝ります。',
+};
+const LIST_NOTES = {
+  own:'自社リストを渡す形になるため、機密保持と「競合の並行受注をしない」ことを契約で明記しましょう。ツール型なら自社管理のまま使えて情報漏れの心配が少なめです。',
+  partial:'不足分のリスト作成コストとデータソースを、見積もりに必ず明記させましょう。「どこから・どんな基準で集めるか」を確認すると品質の当たり外れを避けられます。',
+  outsource:'リストの品質と、「被り」（自社の既存先・過去接触先・他の代行との重複）を除外する仕組みを必ず確認を。リスト費用が別途かかる点にも注意（見積もりに出ないことが多い）。',
+};
+
+/* ===== 選定基準レイヤー（compare.mjs のインライン移植・決定論） ===== */
+const AXES = [
+  { id:'cost',    label:'費用の軽さ',     hint:'月額・初期費の低さ' },
+  { id:'speed',   label:'立ち上げの速さ', hint:'初アポ・初成果までの速さ' },
+  { id:'control', label:'質のコントロール', hint:'人がどれだけ品質を握るか' },
+  { id:'volume',  label:'量・スケール',   hint:'接触量の天井' },
+  { id:'asset',   label:'社内に残る資産', hint:'ノウハウが自社に蓄積するか' },
+];
+const AXIS_POS = {
+  A1:{cost:2,speed:3,control:3,volume:2,asset:1},
+  A2:{cost:1,speed:2,control:3,volume:1,asset:2},
+  B: {cost:2,speed:2,control:2,volume:3,asset:2},
+  C: {cost:3,speed:3,control:1,volume:3,asset:1},
+  D: {cost:3,speed:1,control:2,volume:1,asset:3},
+};
+const AXIS_WEIGHTS = {
+  'goal:0':['speed','control'],'goal:1':['control'],'goal:2':['volume','asset'],'goal:3':['asset','cost'],
+  'price:0':['volume','cost'],'price:2':['control'],
+  'complexity:0':['volume','cost'],'complexity:2':['control'],
+  'resource:0':['speed'],'resource:2':['asset'],
+  'budget:0':['cost'],'budget:2':['control'],
+  'urgency:0':['volume','speed'],'urgency:1':['control'],
+  'ai:0':['asset','cost'],'ai:2':['control','speed'],
+};
+const SAMENESS_CUTTERS = [
+  { claim:'「質の高いアポが取れます」', ask:'アポの定義（役職・課題ヒアリング済み・日程確定）を書面で。件数でなく“商談化率”の実績を数字で出せるか。' },
+  { claim:'「AIで自動化・効率化」',     ask:'どこまでAI・どこから人かの分担表を出せるか。“自動化”の実態が人力と変わらないことがある。' },
+  { claim:'「豊富な実績があります」',   ask:'“同じ業種・同じ単価帯”の実績か。他業種の実績はあなたの商材には効きにくい。' },
+  { claim:'「成果報酬だから安心」',     ask:'成果の定義とキャンセル/ノーショー時の扱い。リスト費用が別途でないか（見積もりに出ないことが多い）。' },
+];
+const normType = t => t==='A'?'A1':t;
+function priorityAxes(ans){
+  const w={};
+  for(const q of QUESTIONS){ for(const i of asArr(ans[q.id])){ const ax=AXIS_WEIGHTS[`${q.id}:${i}`]; if(ax) for(const a of ax) w[a]=(w[a]||0)+1; } }
+  return Object.entries(w).sort((a,b)=>b[1]-a[1]).map(([id])=>id).slice(0,2);
+}
+function comparison(type, secondary, ans){
+  const rp=AXIS_POS[normType(type)], sp=secondary?AXIS_POS[normType(secondary)]:null;
+  const top=priorityAxes(ans), byId=Object.fromEntries(AXES.map(a=>[a.id,a]));
+  const axes=AXES.map(a=>({id:a.id,label:a.label,hint:a.hint,rec:rp?rp[a.id]:null,sec:sp?sp[a.id]:null,priority:top.includes(a.id)}));
+  let tradeoff=null;
+  if(sp&&rp){
+    const secStrong=AXES.map(a=>a.id).sort((x,y)=>sp[y]-sp[x])[0];
+    const winAxis=top.find(ax=>rp[ax]>=sp[ax])??top[0]??null;
+    const giveUp=AXES.map(a=>a.id).find(ax=>sp[ax]>rp[ax])??null;
+    tradeoff={ winAxis:winAxis?byId[winAxis].label:null, secStrongAxis:byId[secStrong].label, giveUpAxis:giveUp?byId[giveUp].label:null };
+  }
+  return { axes, priorityAxes:top.map(id=>byId[id].label), tradeoff };
+}
+
+const asArr = a => a===undefined?[]:Array.isArray(a)?a:[a];
+function tally(ans){ const sc={A:0,C:0,D:0}; for(const q of QUESTIONS){ for(const i of asArr(ans[q.id])){ const s=q.o[i]&&q.o[i].s; if(s){sc.A+=s.A||0;sc.C+=s.C||0;sc.D+=s.D||0;} } } return sc; }
+function classify(ans){
+  const {A,C,D}=tally(ans); const max=Math.max(A,C,D);
+  const goalClosing=asArr(ans.goal).map(i=>Q.goal.o[i].t).some(t=>t.includes('クロージング'));
+  const ai=asArr(ans.ai).map(i=>Q.ai.o[i].t);
+  let key;
+  if(D===max && D>A && D>C) key='D';
+  else if(Math.abs(A-C)<=1) key='B';
+  else if(D>=A && D>=C){ if(ai.some(t=>t.includes('自分')))key='D'; else if(ai.some(t=>t.includes('人に')))key='A'; else if(ai.some(t=>t.includes('任せ')))key='C'; else key='D'; }
+  else key=(A>C)?'A':'C';
+  if(key==='A') key=goalClosing?'A2':'A1';
+  const rank=[['A',A],['C',C],['D',D]].sort((a,b)=>b[1]-a[1]);
+  const secondary=rank[1][1]>0?rank[1][0]:null;
+  return { type:key, scores:{A,C,D}, secondary };
+}
+function listOpt(ans){ const t=asArr(ans.list).map(i=>Q.list.o[i].t)[0]||''; if(t.includes('自社'))return'own'; if(t.includes('一部'))return'partial'; if(t.includes('作成'))return'outsource'; return null; }
+
+/* ===== GA4（スタブ。本番は gtag.js を読み込む） ===== */
+window.dataLayer = window.dataLayer || [];
+function gtag(){ dataLayer.push(arguments); if(!window.__ga_loaded){ console.debug('[GA4]', ...arguments); } }
+
+/* ===== 状態 ===== */
+const answers = {};
+let started = false;
+
+/* ===== レンダリング ===== */
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.getElementById('asof-foot').textContent = CATALOG.asOf;
+
+// 目的チップ（ヒーロー）
+document.getElementById('goal-chips').innerHTML = Q.goal.o.map((o,i)=>`
+  <button data-i="${i}" class="goal-chip text-left px-4 py-3.5 rounded-xl border border-slate-200 bg-white hover:border-primary-300 hover:bg-primary-50/40 transition cursor-pointer flex items-center justify-between group" aria-pressed="false">
+    <span class="font-medium text-slate-900">${esc(o.t)}</span>
+    <span class="text-slate-300 group-hover:text-primary-400">→</span>
+  </button>`).join('');
+
+document.querySelectorAll('.goal-chip').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const i=+btn.dataset.i; answers.goal=i;
+    document.querySelectorAll('.goal-chip').forEach(b=>{ b.setAttribute('aria-pressed','false'); b.classList.remove('border-primary-500','bg-primary-50'); });
+    btn.setAttribute('aria-pressed','true'); btn.classList.add('border-primary-500','bg-primary-50');
+    if(!started){ gtag('event','diagnosis_start',{goal:Q.goal.o[i].t}); started=true; }
+    gtag('event','question_answered',{question:'goal',value:Q.goal.o[i].t});
+    buildWizard();
+    document.getElementById('wizard').classList.remove('hidden');
+    updateProgress();
+    document.getElementById('wizard').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+// ウィザード（目的以外）
+function buildWizard(){
+  const rest = QUESTIONS.filter(q=>q.id!=='goal');
+  document.getElementById('wizard-questions').innerHTML = rest.map(q=>`
+    <div>
+      <div class="flex items-baseline gap-2 mb-2.5">
+        <span class="text-sm font-medium text-slate-900">${esc(q.k)}</span>
+        ${q.optional?'<span class="text-[11px] text-slate-400">任意</span>':''}
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${q.o.map((o,i)=>`<button data-q="${q.id}" data-i="${i}" class="opt-chip inline-flex items-center px-3.5 py-2 rounded-full text-sm border border-slate-200 bg-white text-slate-700 hover:bg-gray-50 cursor-pointer" aria-pressed="false">${esc(o.t)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('.opt-chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const qid=btn.dataset.q, i=+btn.dataset.i;
+      answers[qid]=i;
+      document.querySelectorAll(`.opt-chip[data-q="${qid}"]`).forEach(b=>{ b.setAttribute('aria-pressed','false'); b.classList.remove('border-primary-500','bg-primary-50','text-primary-700'); b.classList.add('border-slate-200','text-slate-700'); });
+      btn.setAttribute('aria-pressed','true'); btn.classList.add('border-primary-500','bg-primary-50','text-primary-700'); btn.classList.remove('border-slate-200','text-slate-700');
+      gtag('event','question_answered',{question:qid,value:Q[qid].o[i].t});
+      updateProgress();
+    });
+  });
+}
+function updateProgress(){
+  const answered=QUESTIONS.filter(q=>answers[q.id]!==undefined).length;
+  const pct=Math.round(answered/QUESTIONS.length*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-fill').parentElement.setAttribute('aria-valuenow',pct);
+  document.getElementById('progress-label').textContent=`${answered} / ${QUESTIONS.length} 問`;
+}
+
+// 診断実行
+document.getElementById('run-btn').addEventListener('click',()=>{
+  if(answers.goal===undefined){ document.getElementById('goal-chips').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  const decision=classify(answers);
+  const answered=QUESTIONS.filter(q=>answers[q.id]!==undefined).length;
+  gtag('event','diagnosis_complete',{result_type:decision.type,answered_count:answered});
+  renderResult(decision);
+  const el=document.getElementById('result');
+  el.classList.remove('hidden'); el.scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+function renderResult(decision){
+  const cat=CATALOG.types[decision.type];
+  const reasoning=TEMPLATE[decision.type];
+  const lo=listOpt(answers);
+  const listNote=lo?LIST_NOTES[lo]:null;
+  const secKey=decision.secondary?normType(decision.secondary):null;
+  const sec=secKey?CATALOG.types[secKey]:null;
+  const cmp=comparison(decision.type, decision.secondary, answers);
+  // 軸の●●○表示（priority軸はプライマリ色で強調）
+  const dots=(n,on)=>Array.from({length:3},(_,k)=>`<span class="inline-block w-2 h-2 rounded-full ${k<n?(on||'bg-slate-400'):'bg-slate-200'}"></span>`).join(' ');
+
+  document.getElementById('result').innerHTML=`
+  <div class="fade-in space-y-5">
+    <!-- 判定ヘッダー -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-medium border border-primary-200">あなたへのおすすめ</span>
+        <span class="text-xs text-slate-400">${CATALOG.asOf}時点の情報</span>
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-xl bg-primary-500 text-white inline-flex items-center justify-center text-lg font-bold flex-shrink-0">${esc(cat.accent)}</div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight">${esc(cat.name)}<span class="text-slate-400 font-medium text-lg">／${esc(cat.sub)}</span></h2>
+          <p class="mt-2 text-base text-body leading-relaxed">${esc(cat.head)}</p>
+        </div>
+      </div>
+      <p class="mt-5 text-base text-body leading-relaxed border-t border-slate-100 pt-5">${esc(reasoning)}</p>
+    </div>
+
+    <!-- なぜこの型か（共通5軸で比較） -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
+      <h3 class="font-semibold text-slate-900 mb-1">なぜこの型か — 5つの軸で比較</h3>
+      <p class="text-sm text-slate-500 mb-5">どの代行も言うことは似ています。同じ“ものさし”で並べると、あなたに効く型が見えます。</p>
+      ${cmp.priorityAxes.length?`<div class="flex flex-wrap items-center gap-2 mb-4 text-sm">
+        <span class="text-slate-500">あなたが特に重視:</span>
+        ${cmp.priorityAxes.map(l=>`<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-medium border border-primary-200">${esc(l)}</span>`).join('')}
+      </div>`:''}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-separate border-spacing-0">
+          <thead>
+            <tr class="text-xs text-slate-500">
+              <th scope="col" class="text-left font-medium py-2 pr-3">選定の軸</th>
+              <th scope="col" class="text-center font-semibold text-primary-700 py-2 px-3 whitespace-nowrap">おすすめ<br><span class="font-medium text-slate-400">${esc(cat.name.replace('型',''))}</span></th>
+              ${sec?`<th scope="col" class="text-center font-medium py-2 px-3 whitespace-nowrap">次点<br><span class="text-slate-400">${esc(sec.name.replace('型',''))}</span></th>`:''}
+            </tr>
+          </thead>
+          <tbody>
+            ${cmp.axes.map(a=>`<tr class="${a.priority?'bg-primary-50/50':''}">
+              <td class="py-2.5 pr-3 border-t border-slate-100">
+                <span class="font-medium ${a.priority?'text-primary-800':'text-slate-900'}">${esc(a.label)}</span>
+                ${a.priority?'<span class="ml-1.5 text-[10px] text-primary-500 align-middle">★重視</span>':''}
+                <span class="block text-[11px] text-slate-400">${esc(a.hint)}</span>
+              </td>
+              <td class="text-center py-2.5 px-3 border-t border-slate-100"><span class="inline-flex gap-1">${dots(a.rec,'bg-primary-500')}</span></td>
+              ${sec?`<td class="text-center py-2.5 px-3 border-t border-slate-100"><span class="inline-flex gap-1">${dots(a.sec,'bg-slate-400')}</span></td>`:''}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${cmp.tradeoff&&sec?`<div class="mt-5 p-4 bg-primary-50 border border-primary-200 text-primary-800 rounded-lg text-sm leading-relaxed">
+        あなたが重視する<b>「${esc(cmp.tradeoff.winAxis)}」</b>では、<b>${esc(cat.name)}</b>が最も効きます。次点の<b>${esc(sec.name)}</b>は<b>「${esc(cmp.tradeoff.secStrongAxis)}」</b>が強みですが、${cmp.tradeoff.giveUpAxis?`その分<b>「${esc(cmp.tradeoff.giveUpAxis)}」</b>を諦めることになり、`:''}あなたの状況では優先度が下がります。迷ったら両方の提案を並べて比べると判断しやすくなります。
+      </div>`:''}
+    </div>
+
+    <!-- 相場 -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">相場の目安</h3>
+      <p class="text-lg font-semibold text-slate-900">${esc(cat.price)}</p>
+      <p class="mt-1 text-sm text-body">${esc(cat.priceNote)}</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <!-- 選定基準 -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <h3 class="font-semibold text-slate-900 mb-4">契約前に確認すべきこと</h3>
+        <ul class="space-y-3">
+          ${cat.checks.map(c=>`<li class="flex items-start gap-2.5 text-sm text-body leading-relaxed"><span class="mt-0.5 text-primary-500 flex-shrink-0">✓</span><span>${esc(c)}</span></li>`).join('')}
+        </ul>
+      </div>
+      <!-- レッドフラグ（全周ボーダーAlert・border-l-4禁止） -->
+      <div class="p-6 bg-amber-50 border border-amber-200 rounded-xl">
+        <h3 class="font-semibold text-amber-900 mb-4 flex items-center gap-2">⚠ 避けるべきレッドフラグ</h3>
+        <ul class="space-y-3">
+          ${cat.redFlags.map(f=>`<li class="flex items-start gap-2.5 text-sm text-amber-900 leading-relaxed"><span class="mt-0.5 flex-shrink-0">✕</span><span>${esc(f)}</span></li>`).join('')}
+        </ul>
+      </div>
+    </div>
+
+    ${listNote?`<div class="p-4 bg-primary-50 border border-primary-200 text-primary-800 rounded-lg text-sm leading-relaxed flex items-start gap-3"><span class="flex-shrink-0 font-semibold">リスト</span><span>${esc(listNote)}</span></div>`:''}
+
+    <!-- 見極め質問（「どこも同じ話に聞こえる」を切る） -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
+      <h3 class="font-semibold text-slate-900 mb-1">どこも同じ話に聞こえたら — 違いが出る質問</h3>
+      <p class="text-sm text-slate-500 mb-5">営業トークはどこも似ています。次の質問を投げると、実力の差がはっきり出ます。</p>
+      <ul class="space-y-4">
+        ${SAMENESS_CUTTERS.map(c=>`<li class="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+          <span class="flex-shrink-0 sm:w-52 text-sm text-slate-400 italic">${esc(c.claim)}</span>
+          <span class="flex items-start gap-2 text-sm text-body leading-relaxed"><span class="mt-0.5 text-primary-500 flex-shrink-0">→</span><span>${esc(c.ask)}</span></span>
+        </li>`).join('')}
+      </ul>
+    </div>
+
+    <!-- 候補 + 送客CTA -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
+      <h3 class="font-semibold text-slate-900 mb-1">この型に合うサービス候補</h3>
+      <p class="text-sm text-slate-500 mb-5">中立の観点で該当する候補です。条件を伝えて、まとめて提案を受け取れます。</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        ${cat.candidates.map(c=>`
+          <div class="border border-slate-200 rounded-lg p-4 hover:border-primary-300 transition">
+            <p class="font-medium text-slate-900">${esc(c.name)}</p>
+            <p class="mt-1 text-sm text-body leading-relaxed">${esc(c.why)}</p>
+            <button data-cand="${esc(c.name)}" class="cta-cand mt-3 inline-flex items-center gap-1.5 h-8 px-3 text-[0.875rem] font-medium bg-primary-500 text-white rounded-lg hover:bg-primary-700 cursor-pointer">この条件で相談する</button>
+          </div>`).join('')}
+      </div>
+      <div class="mt-6 pt-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center gap-3">
+        <button data-cand="all" class="cta-cand inline-flex items-center justify-center gap-2 h-12 px-6 text-[1rem] font-medium bg-primary-500 text-white rounded-lg hover:bg-primary-700 cursor-pointer">条件に合う提案をまとめて受け取る（無料）</button>
+        <span class="text-xs text-slate-500">しつこい営業はありません。比較のための情報だけお届けします。</span>
+      </div>
+    </div>
+
+    <!-- 評価導線 -->
+    <div class="bg-gray-50 rounded-xl border border-slate-200 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <span class="text-sm font-medium text-slate-900">この診断は役に立ちましたか？</span>
+      <div class="flex gap-2" id="rating">
+        <button data-r="up" class="rate-btn inline-flex items-center gap-2 h-10 px-4 text-sm font-medium bg-white text-slate-700 border border-slate-200 rounded-lg hover:bg-gray-50 cursor-pointer">👍 役に立った</button>
+        <button data-r="down" class="rate-btn inline-flex items-center gap-2 h-10 px-4 text-sm font-medium bg-white text-slate-700 border border-slate-200 rounded-lg hover:bg-gray-50 cursor-pointer">👎 いまいち</button>
+      </div>
+    </div>
+  </div>`;
+
+  document.querySelectorAll('.cta-cand').forEach(b=>b.addEventListener('click',()=>{
+    gtag('event','cta_click',{result_type:decision.type,candidate:b.dataset.cand});
+    alert('（プロトタイプ）送客フォームへ遷移します。本番では見積もり導線に接続します。');
+  }));
+  document.querySelectorAll('.rate-btn').forEach(b=>b.addEventListener('click',()=>{
+    gtag('event','rating_click',{result_type:decision.type,rating:b.dataset.r});
+    document.getElementById('rating').innerHTML='<span class="text-sm text-primary-700 font-medium">ありがとうございます。改善に役立てます。</span>';
+  }));
+}
+
+// 4象限カード
+document.getElementById('compare-cards').innerHTML = ['A1','A2','B','C','D'].map(t=>{
+  const c=CATALOG.types[t];
+  return `<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+    <div class="w-9 h-9 rounded-lg bg-primary-50 text-primary-500 inline-flex items-center justify-center font-bold mb-3">${esc(c.accent)}</div>
+    <p class="font-semibold text-slate-900 text-sm">${esc(c.name)}</p>
+    <p class="text-xs text-slate-400 mb-2">${esc(c.sub)}</p>
+    <p class="text-sm text-body leading-relaxed">${esc(c.head)}</p>
+  </div>`;
+}).join('');
+</script>
+</body>
+</html>
